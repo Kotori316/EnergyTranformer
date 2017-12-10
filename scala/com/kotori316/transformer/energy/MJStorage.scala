@@ -39,15 +39,15 @@ class MJStorage(hasBC: Boolean, tile: TileTrans) extends ICapabilityProvider wit
 
     @Method(modid = "BuildCraftAPI|core")
     override def receivePower(microJoules: Long, simulate: Boolean) = {
-        if (tile.capacity - tile.allEnergy < microJoules) {
-            val r = tile.capacity - tile.allEnergy
+        if (tile.acceptable < microJoules) {
+            val r = tile.acceptable
             if (!simulate) {
-                tile.allEnergy = tile.capacity
+                tile.addEnergy(r)
             }
             r
         } else {
             if (!simulate) {
-                tile.allEnergy += microJoules
+                tile.addEnergy(microJoules)
             }
             microJoules
         }
@@ -55,7 +55,7 @@ class MJStorage(hasBC: Boolean, tile: TileTrans) extends ICapabilityProvider wit
 
     @Method(modid = "BuildCraftAPI|core")
     override def getPowerRequested = {
-        tile.capacity - tile.allEnergy
+        tile.acceptable
     }
 
     @Method(modid = "BuildCraftAPI|core")

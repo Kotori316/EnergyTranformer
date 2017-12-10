@@ -22,6 +22,11 @@ class TileTrans extends TileEntity with ITickable
 
     var allEnergy = 0l
     var extractFacing: EnumFacing = EnumFacing.UP
+    var lastRecieveTick = 0l
+    var lastExtractTick = 0l
+    private val numElements = 400
+    val recieveQueue = new java.util.ArrayDeque[Long](numElements)
+    val extractQueue = new java.util.ArrayDeque[Long](numElements)
     val capacity = 1e18.toLong
     private[this] val hasBC = ModAPIManager.INSTANCE.hasAPI("BuildCraftAPI|core")
     private[this] val hasRF = Loader.isModLoaded("redstoneflux")
@@ -32,6 +37,20 @@ class TileTrans extends TileEntity with ITickable
 
     override def update() = {
         if (!getWorld.isRemote) {
+            if (lastExtractTick != getWorld.getTotalWorldTime) {
+                lastExtractTick = getWorld.getTotalWorldTime
+                if (extractQueue.size() >= numElements) {
+                    extractQueue.poll()
+                }
+                extractQueue.add(0l)
+            }
+            if (lastRecieveTick != getWorld.getTotalWorldTime) {
+                lastRecieveTick = getWorld.getTotalWorldTime
+                if (recieveQueue.size() >= numElements) {
+                    recieveQueue.poll()
+                }
+                recieveQueue.add(0l)
+            }
             val t = getWorld.getTileEntity(getPos.offset(extractFacing))
             if (t != null) {
                 if (hasRF && isRFReciever(t)) {
@@ -106,7 +125,47 @@ class TileTrans extends TileEntity with ITickable
         l.toInt
     }
 
-    private def acceptable: Long = {
+    def addEnergy(amount: Long): Unit = {
+        allEnergy += amount
+        if (lastRecieveTick == getWorld.getTotalWorldTime) {
+            recieveQueue.addLast(recieveQueue.pollLast() + amount)
+        } else {
+            lastRecieveTick = getWorld.getTotalWorldTime
+            if (recieveQueue.size() >= numElements) {
+                recieveQueue.poll()
+            }
+            recieveQueue.addLast(amount)
+        }
+    }
+
+    def minusEnergy(amount: Long): Unit = {
+        allEnergy -= amount
+        if (lastExtractTick == getWorld.getTotalWorldTime) {
+            extractQueue.addLast(extractQueue.pollLast() + amount)
+        } else {
+            lastExtractTick = getWorld.getTotalWorldTime
+            if (extractQueue.size() >= numElements) {
+                extractQueue.poll()
+            }
+            extractQueue.addLast(amount)
+        }
+    }
+
+    def getRecievedAverage: Long = {
+        import scala.collection.JavaConverters._
+        val sum = recieveQueue.asScala.sum
+        if (sum == 0) return 0l
+        sum / recieveQueue.size()
+    }
+
+    def getExtractedAverage: Long = {
+        import scala.collection.JavaConverters._
+        val sum = extractQueue.asScala.sum
+        if (sum == 0) return 0l
+        sum / extractQueue.size()
+    }
+
+    def acceptable: Long = {
         Math.max(tile.capacity - tile.allEnergy, 0l)
     }
 
@@ -123,9 +182,13 @@ class TileTrans extends TileEntity with ITickable
 
         override def getEnergyStored = ForgeEnergy.getEnergyStored
 
-        override def receiveEnergy(maxReceive: Int, simulate: Boolean) = ForgeEnergy.receiveEnergy(maxReceive, simulate, ())
+        override def receiveEnergy(maxReceive: Int, simulate: Boolean) =
+            if (canReceive) ForgeEnergy.receiveEnergy(maxReceive, simulate, ())
+            else 0
 
-        override def extractEnergy(maxExtract: Int, simulate: Boolean) = ForgeEnergy.extractEnergy(maxExtract, simulate, ())
+        override def extractEnergy(maxExtract: Int, simulate: Boolean) =
+            if (canExtract) ForgeEnergy.extractEnergy(maxExtract, simulate, ())
+            else 0
     }
 
     private object ForgeEnergy extends IEnergyStorage {
@@ -139,12 +202,12 @@ class TileTrans extends TileEntity with ITickable
             val acc = acceptable
             if (maxReceive * oneFEis > acc) {
                 if (!simulate) {
-                    tile.allEnergy = tile.capacity
+                    addEnergy(maxReceive * oneFEis - acc)
                 }
                 ((maxReceive * oneFEis - acc) / oneFEis).toInt
             } else {
                 if (!simulate) {
-                    tile.allEnergy += maxReceive * oneFEis
+                    addEnergy(maxReceive * oneFEis)
                 }
                 maxReceive
             }
@@ -158,18 +221,18 @@ class TileTrans extends TileEntity with ITickable
             val stored = tile.allEnergy
             if (stored < maxExtract * oneFEis) {
                 if (!simulate) {
-                    tile.allEnergy = 0
+                    minusEnergy(maxExtract * oneFEis - stored)
                 }
                 ((maxExtract * oneFEis - stored) / oneFEis).toInt
             } else {
                 if (!simulate) {
-                    tile.allEnergy -= maxExtract * oneFEis
+                    minusEnergy(maxExtract * oneFEis)
                 }
                 maxExtract
             }
         }
 
-        override def getMaxEnergyStored: Int = Int.MaxValue
+        override val getMaxEnergyStored: Int = safeDivide(tile.capacity, oneFEis)
     }
 
     //Redstone Flux
@@ -182,10 +245,10 @@ class TileTrans extends TileEntity with ITickable
     override def extractEnergy(from: EnumFacing, maxExtract: Int, simulate: Boolean) = energyStorages(from).extractEnergy(maxExtract, simulate)
 
     @Method(modid = "redstoneflux")
-    override def getMaxEnergyStored(from: EnumFacing) = Int.MaxValue
+    override def getMaxEnergyStored(from: EnumFacing) = ForgeEnergy.getMaxEnergyStored
 
     @Method(modid = "redstoneflux")
-    override def getEnergyStored(from: EnumFacing) = safeDivide(tile.allEnergy, oneRFis)
+    override def getEnergyStored(from: EnumFacing) = ForgeEnergy.getEnergyStored
 
     @Method(modid = "redstoneflux")
     override def canConnectEnergy(from: EnumFacing) = true
@@ -216,7 +279,7 @@ class TileTrans extends TileEntity with ITickable
     @Method(modid = "ic2")
     override def injectEnergy(directionFrom: EnumFacing, amount: Double, voltage: Double) = {
         if (directionFrom != extractFacing.getOpposite) {
-            tile.allEnergy += (amount * oneEUis.toDouble).toLong
+            addEnergy((amount * oneEUis.toDouble).toLong)
             0
         } else {
             amount
@@ -228,7 +291,7 @@ class TileTrans extends TileEntity with ITickable
 
     @Method(modid = "ic2")
     override def drawEnergy(amount: Double) = {
-        tile.allEnergy -= (amount * oneEUis.toDouble).toLong
+        minusEnergy((amount * oneEUis.toDouble).toLong)
         if (tile.allEnergy < 0) tile.allEnergy = 0
     }
 

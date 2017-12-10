@@ -16,6 +16,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
@@ -23,6 +24,8 @@ import org.apache.logging.log4j.Logger;
 
 import com.kotori316.transformer.block.BlockTrans;
 import com.kotori316.transformer.block.TileTrans;
+import com.kotori316.transformer.gui.GuiHandler;
+import com.kotori316.transformer.network.PacketHandler;
 
 @Mod(name = EnergyTranformer.MOD_NAME, modid = EnergyTranformer.modID, version = "${version}")
 public class EnergyTranformer {
@@ -43,7 +46,8 @@ public class EnergyTranformer {
 
     @EventHandler
     public void init(FMLInitializationEvent event) {
-
+        PacketHandler.INStANCE.init();
+        NetworkRegistry.INSTANCE.registerGuiHandler(instance, GuiHandler.instance());
     }
 
     @EventHandler

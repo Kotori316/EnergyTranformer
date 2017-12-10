@@ -1,10 +1,12 @@
 package com.kotori316.transformer.block
 
 import com.kotori316.transformer.EnergyTranformer
+import com.kotori316.transformer.gui.GuiHandler
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.{BlockStateContainer, IBlockState}
 import net.minecraft.block.{BlockContainer, BlockDirectional}
 import net.minecraft.creativetab.CreativeTabs
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.entity.{EntityLiving, EntityLivingBase}
 import net.minecraft.item.{ItemBlock, ItemStack}
 import net.minecraft.util.math.BlockPos
@@ -29,6 +31,15 @@ object BlockTrans extends BlockContainer(Material.IRON) {
     override def getStateForPlacement(world: World, pos: BlockPos, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float,
                                       meta: Int, placer: EntityLivingBase, hand: EnumHand): IBlockState = {
         getDefaultState.withProperty(FACING, facing.getOpposite)
+    }
+
+    override def onBlockActivated(worldIn: World, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand,
+                                  facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
+        if (!playerIn.isSneaking) {
+            playerIn.openGui(EnergyTranformer.instance, GuiHandler.guiID_trans, worldIn, pos.getX, pos.getY, pos.getZ)
+            return true
+        }
+        super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)
     }
 
     override def onBlockPlacedBy(worldIn: World, pos: BlockPos, state: IBlockState, placer: EntityLivingBase, stack: ItemStack): Unit = {
