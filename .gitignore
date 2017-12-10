@@ -1,0 +1,12 @@
+# idea
+*.ipr
+*.iml
+
+# gradle
+build
+.gradle
+
+# other
+Minecraft
+gradle-app.setting
+FILES
