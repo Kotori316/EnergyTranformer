@@ -31,9 +31,9 @@ class TileTrans extends TileEntity with ITickable
     private[this] val hasBC = ModAPIManager.INSTANCE.hasAPI("BuildCraftAPI|core")
     private[this] val hasRF = Loader.isModLoaded("redstoneflux")
     private[this] val hasIC2 = Loader.isModLoaded("ic2")
-    private[this] val mJStorages = EnumFacing.VALUES.map(f => (f, MJStorage(hasBC, this, f))).toMap
+    private[this] val mJStorages = EnumFacing.VALUES.+:(null).map(f => (f, MJStorage(hasBC, this, f))).toMap
     private[this] val iC2Helper = new IC2Helper(hasIC2, this)
-    private[this] val energyStorages = EnumFacing.VALUES.map(f => (f, new ForgeEnergyFacing(f))).toMap
+    private[this] val energyStorages = EnumFacing.VALUES.map(f => (f, new ForgeEnergyFacing(f))).+:((null, ForgeEnergy)).toMap
 
     override def update() = {
         if (!getWorld.isRemote) {
@@ -191,7 +191,7 @@ class TileTrans extends TileEntity with ITickable
             else 0
     }
 
-    private object ForgeEnergy extends IEnergyStorage {
+    private object ForgeEnergy extends ForgeEnergyFacing(null) {
         override val canReceive: Boolean = false
 
         override def getEnergyStored: Int = safeDivide(tile.allEnergy, oneFEis)
