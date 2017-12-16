@@ -25,7 +25,7 @@ class ContainerTrans(tile: TileTrans, player: EntityPlayer) extends Container {
     override def detectAndSendChanges(): Unit = {
         super.detectAndSendChanges()
         if (!tile.getWorld.isRemote) {
-            PacketHandler.INStANCE.sendToPlayer(new TransAverageMessage(tile), player.asInstanceOf[EntityPlayerMP])
+            PacketHandler.INSTANCE.sendToPlayer(new TransAverageMessage(tile), player.asInstanceOf[EntityPlayerMP])
         }
     }
 }

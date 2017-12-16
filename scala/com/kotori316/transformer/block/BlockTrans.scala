@@ -35,7 +35,7 @@ object BlockTrans extends BlockContainer(Material.IRON) {
     override def onBlockActivated(worldIn: World, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand,
                                   facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
         if (!playerIn.isSneaking) {
-            playerIn.openGui(EnergyTranformer.instance, GuiHandler.guiID_trans, worldIn, pos.getX, pos.getY, pos.getZ)
+            playerIn.openGui(EnergyTranformer.INSTANCE, GuiHandler.guiID_trans, worldIn, pos.getX, pos.getY, pos.getZ)
             return true
         }
         super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)

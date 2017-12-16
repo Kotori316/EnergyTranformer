@@ -10,7 +10,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import com.kotori316.transformer.EnergyTranformer;
 
 public enum PacketHandler {
-    INStANCE;
+    INSTANCE;
 
     private final SimpleNetworkWrapper wrapper;
 

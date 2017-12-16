@@ -30,24 +30,24 @@ import com.kotori316.transformer.network.PacketHandler;
 @Mod(name = EnergyTranformer.MOD_NAME, modid = EnergyTranformer.modID, version = "${version}")
 public class EnergyTranformer {
 
-    public static final EnergyTranformer instance;
+    public static final EnergyTranformer INSTANCE;
     public static final String MOD_NAME = "EnergyTranformer";
     public static final String modID = "kotori_energytrans";
     public static final Logger LOGGER = LogManager.getLogger(MOD_NAME);
 
     static {
-        instance = new EnergyTranformer();
+        INSTANCE = new EnergyTranformer();
     }
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        MinecraftForge.EVENT_BUS.register(instance);
+        MinecraftForge.EVENT_BUS.register(INSTANCE);
     }
 
     @EventHandler
     public void init(FMLInitializationEvent event) {
-        PacketHandler.INStANCE.init();
-        NetworkRegistry.INSTANCE.registerGuiHandler(instance, GuiHandler.instance());
+        PacketHandler.INSTANCE.init();
+        NetworkRegistry.INSTANCE.registerGuiHandler(EnergyTranformer.instance(), GuiHandler.instance());
     }
 
     @EventHandler
@@ -74,7 +74,7 @@ public class EnergyTranformer {
     }
 
     @Mod.InstanceFactory
-    public static EnergyTranformer getInstance() {
-        return instance;
+    public static EnergyTranformer instance() {
+        return INSTANCE;
     }
 }
