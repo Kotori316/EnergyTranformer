@@ -24,16 +24,16 @@ class TileTrans extends TileEntity with ITickable
     var extractFacing: EnumFacing = EnumFacing.UP
     var lastRecieveTick = 0l
     var lastExtractTick = 0l
-    private val numElements = 400
+    private[this] val numElements = 400
     val recieveQueue = new java.util.ArrayDeque[Long](numElements)
     val extractQueue = new java.util.ArrayDeque[Long](numElements)
     val capacity = 1e18.toLong
     private[this] val hasBC = ModAPIManager.INSTANCE.hasAPI("BuildCraftAPI|core")
     private[this] val hasRF = Loader.isModLoaded("redstoneflux")
     private[this] val hasIC2 = Loader.isModLoaded("ic2")
-    private[this] val mJStorage = new MJStorage(hasBC, this)
+    private[this] val mJStorages = EnumFacing.VALUES.map(f => (f, MJStorage(hasBC, this, f))).toMap
     private[this] val iC2Helper = new IC2Helper(hasIC2, this)
-    private[this] val energyStorages = EnumFacing.values().map(f => (f, new ForgeEnergyFacing(f))).toMap
+    private[this] val energyStorages = EnumFacing.VALUES.map(f => (f, new ForgeEnergyFacing(f))).toMap
 
     override def update() = {
         if (!getWorld.isRemote) {
@@ -57,6 +57,8 @@ class TileTrans extends TileEntity with ITickable
                     transferRF(t, extractFacing.getOpposite)
                 } else if (hasIC2 && isEUReciever(t)) {
                     transferEU(t, extractFacing.getOpposite)
+                } else if (hasBC && MJStorage.isMJReciever(t, extractFacing.getOpposite)) {
+                    mJStorages(extractFacing).tranferMJ(t, extractFacing.getOpposite)
                 } else if (t.hasCapability(CapabilityEnergy.ENERGY, extractFacing.getOpposite)) {
                     val handler = t.getCapability(CapabilityEnergy.ENERGY, extractFacing.getOpposite)
                     if (handler.canReceive) {
@@ -102,7 +104,7 @@ class TileTrans extends TileEntity with ITickable
         if (capability == CapabilityEnergy.ENERGY) {
             true
         } else {
-            mJStorage.hasCapability(capability, facing) || super.hasCapability(capability, facing)
+            (hasBC && mJStorages(facing).hasCapability(capability, facing)) || super.hasCapability(capability, facing)
         }
     }
 
@@ -111,7 +113,7 @@ class TileTrans extends TileEntity with ITickable
             return CapabilityEnergy.ENERGY.cast(energyStorages.getOrElse(facing, ForgeEnergy))
         }
         if (hasBC) {
-            val t = mJStorage.getCapability(capability, facing)
+            val t = mJStorages(facing).getCapability(capability, facing)
             if (t != null)
                 return t.asInstanceOf[T]
         }
@@ -165,9 +167,7 @@ class TileTrans extends TileEntity with ITickable
         sum / extractQueue.size()
     }
 
-    def acceptable: Long = {
-        Math.max(tile.capacity - tile.allEnergy, 0l)
-    }
+    def acceptable: Long = Math.max(tile.capacity - tile.allEnergy, 0l)
 
     //Forge Energy
     val oneFEis = 1e5.toLong
@@ -192,7 +192,7 @@ class TileTrans extends TileEntity with ITickable
     }
 
     private object ForgeEnergy extends IEnergyStorage {
-        override def canReceive: Boolean = false
+        override val canReceive: Boolean = false
 
         override def getEnergyStored: Int = safeDivide(tile.allEnergy, oneFEis)
 
@@ -213,7 +213,7 @@ class TileTrans extends TileEntity with ITickable
             }
         }
 
-        override def canExtract: Boolean = false
+        override val canExtract: Boolean = false
 
         override def extractEnergy(maxExtract: Int, simulate: Boolean): Int = 0
 
@@ -254,9 +254,7 @@ class TileTrans extends TileEntity with ITickable
     override def canConnectEnergy(from: EnumFacing) = true
 
     @Method(modid = "redstoneflux")
-    private def isRFReciever(t: TileEntity) = {
-        t.isInstanceOf[IEnergyReceiver]
-    }
+    private def isRFReciever(t: TileEntity) = t.isInstanceOf[IEnergyReceiver]
 
     @Method(modid = "redstoneflux")
     private def transferRF(t: TileEntity, facing: EnumFacing): Unit = {
@@ -308,9 +306,7 @@ class TileTrans extends TileEntity with ITickable
     override def emitsEnergyTo(receiver: IEnergyAcceptor, side: EnumFacing) = side == extractFacing
 
     @Method(modid = "ic2")
-    def isEUReciever(t: TileEntity): Boolean = {
-        t.isInstanceOf[IEnergySink]
-    }
+    def isEUReciever(t: TileEntity): Boolean = t.isInstanceOf[IEnergySink]
 
     @Method(modid = "ic2")
     def transferEU(t: TileEntity, facing: EnumFacing): Unit = {

@@ -19,9 +19,7 @@ class IC2Helper(val hasIC2: Boolean, tile: TileTrans) {
     }
 
     @Method(modid = "ic2")
-    private def postLoadInternal(): Unit = {
-        MinecraftForge.EVENT_BUS.post(new EnergyTileLoadEvent(tile))
-    }
+    private def postLoadInternal(): Unit = MinecraftForge.EVENT_BUS.post(new EnergyTileLoadEvent(tile))
 
     def postUnloadEvent(): Unit = {
         if (ic2Inited) {
@@ -33,7 +31,6 @@ class IC2Helper(val hasIC2: Boolean, tile: TileTrans) {
     }
 
     @Method(modid = "ic2")
-    def postUnloadInternal(): Unit = {
-        MinecraftForge.EVENT_BUS.post(new EnergyTileUnloadEvent(tile))
-    }
+    private def postUnloadInternal(): Unit = MinecraftForge.EVENT_BUS.post(new EnergyTileUnloadEvent(tile))
+
 }

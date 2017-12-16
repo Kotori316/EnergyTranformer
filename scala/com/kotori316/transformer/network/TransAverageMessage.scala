@@ -47,6 +47,7 @@ class TransAverageMessage(tile: TileTrans) extends IMessage {
             override def run(): Unit = {
                 Minecraft.getMinecraft.player.openContainer match {
                     case c: ContainerTrans => c.recieveAve = recieveAverage; c.extractAve = extractAverage
+                    case _ =>
                 }
             }
         })

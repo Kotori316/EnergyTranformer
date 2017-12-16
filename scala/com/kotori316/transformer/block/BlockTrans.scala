@@ -20,7 +20,7 @@ object BlockTrans extends BlockContainer(Material.IRON) {
 
     setUnlocalizedName(NAME)
     setRegistryName(EnergyTranformer.modID, NAME)
-    setCreativeTab(CreativeTabs.COMBAT)
+    setCreativeTab(CreativeTabs.REDSTONE)
     setHardness(5.0f)
     val itemBlock = new ItemBlock(this)
     itemBlock.setRegistryName(EnergyTranformer.modID, NAME)
@@ -29,9 +29,8 @@ object BlockTrans extends BlockContainer(Material.IRON) {
     override def createNewTileEntity(worldIn: World, meta: Int) = new TileTrans
 
     override def getStateForPlacement(world: World, pos: BlockPos, facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float,
-                                      meta: Int, placer: EntityLivingBase, hand: EnumHand): IBlockState = {
+                                      meta: Int, placer: EntityLivingBase, hand: EnumHand): IBlockState =
         getDefaultState.withProperty(FACING, facing.getOpposite)
-    }
 
     override def onBlockActivated(worldIn: World, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand,
                                   facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
@@ -55,9 +54,7 @@ object BlockTrans extends BlockContainer(Material.IRON) {
 
     override def getStateFromMeta(meta: Int): IBlockState = getDefaultState.withProperty(FACING, EnumFacing.getFront(meta))
 
-    override def createBlockState(): BlockStateContainer = {
-        new BlockStateContainer(this, FACING)
-    }
+    override def createBlockState(): BlockStateContainer = new BlockStateContainer(this, FACING)
 
     override def getRenderType(state: IBlockState) = EnumBlockRenderType.MODEL
 
