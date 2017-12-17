@@ -174,25 +174,26 @@ class TileTrans extends TileEntity with ITickable
 
     private class ForgeEnergyFacing(facing: EnumFacing) extends IEnergyStorage {
 
-        override def canExtract = facing == extractFacing
+        override def canExtract: Boolean = facing == extractFacing
 
-        override def canReceive = facing != extractFacing
+        override def canReceive: Boolean = facing != extractFacing
 
-        override def getMaxEnergyStored = ForgeEnergy.getMaxEnergyStored
+        override def getMaxEnergyStored: Int = ForgeEnergy.getMaxEnergyStored
 
-        override def getEnergyStored = ForgeEnergy.getEnergyStored
+        override def getEnergyStored: Int = ForgeEnergy.getEnergyStored
 
-        override def receiveEnergy(maxReceive: Int, simulate: Boolean) =
+        override def receiveEnergy(maxReceive: Int, simulate: Boolean): Int =
             if (canReceive) ForgeEnergy.receiveEnergy(maxReceive, simulate, ())
             else 0
 
-        override def extractEnergy(maxExtract: Int, simulate: Boolean) =
+        override def extractEnergy(maxExtract: Int, simulate: Boolean): Int =
             if (canExtract) ForgeEnergy.extractEnergy(maxExtract, simulate, ())
             else 0
     }
 
     private object ForgeEnergy extends ForgeEnergyFacing(null) {
         override val canReceive: Boolean = false
+        val oneFEis = 1e5.toLong
 
         override def getEnergyStored: Int = safeDivide(tile.allEnergy, oneFEis)
 
