@@ -24,7 +24,7 @@ compileScala {
 }
 
 minecraft {
-    version = "1.12.2-14.23.3.2655"
+    version = "1.12.2-14.23.4.2703"
     runDir = "Minecraft"
 
     mappings = "snapshot_20171003"
@@ -53,7 +53,7 @@ repositories {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     deobfCompile "cofh:RedstoneFlux:1.12-2.0.1.2:universal"
-    deobfCompile "com.mod-buildcraft:buildcraft:7.99.16"
+    deobfCompile "com.mod-buildcraft:buildcraft:7.99.17"
     deobfCompile 'net.industrial-craft:industrialcraft-2:2.8.75-ex112:dev'
 }
 
