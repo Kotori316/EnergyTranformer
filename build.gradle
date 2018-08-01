@@ -52,7 +52,7 @@ repositories {
 }
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    deobfCompile "cofh:RedstoneFlux:1.12-2.0.1.2:universal"
+    deobfCompile "cofh:RedstoneFlux:1.12-2.0.2.4:universal"
     deobfCompile "com.mod-buildcraft:buildcraft:7.99.17"
     deobfCompile 'net.industrial-craft:industrialcraft-2:2.8.75-ex112:dev'
 }
