@@ -22,7 +22,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.kotori316.transformer.block.BlockSource;
+import com.kotori316.transformer.block.BlockSource$;
 import com.kotori316.transformer.block.BlockTrans;
+import com.kotori316.transformer.block.TileSource;
 import com.kotori316.transformer.block.TileTrans;
 import com.kotori316.transformer.gui.GuiHandler;
 import com.kotori316.transformer.network.PacketHandler;
@@ -58,19 +61,24 @@ public class EnergyTranformer {
     @SubscribeEvent
     public void registerBlocks(RegistryEvent.Register<Block> event) {
         event.getRegistry().register(BlockTrans.instance());
+        event.getRegistry().register(BlockSource$.MODULE$);
         TileEntity.register(modID + ":" + BlockTrans.NAME(), TileTrans.class);
+        TileEntity.register(modID + ":" + BlockSource.NAME(), TileSource.class);
     }
 
     @SubscribeEvent
     public void registerItems(RegistryEvent.Register<Item> event) {
         event.getRegistry().register(BlockTrans.itemBlock());
+        event.getRegistry().register(BlockSource.itemBlock());
     }
 
     @SubscribeEvent
     @SideOnly(Side.CLIENT)
     public void registerModels(ModelRegistryEvent event) {
         ModelLoader.setCustomModelResourceLocation(BlockTrans.itemBlock(), 0,
-                new ModelResourceLocation(Objects.requireNonNull(BlockTrans.itemBlock().getRegistryName()), "inventory"));
+            new ModelResourceLocation(Objects.requireNonNull(BlockTrans.itemBlock().getRegistryName()), "inventory"));
+        ModelLoader.setCustomModelResourceLocation(BlockSource.itemBlock(), 0,
+            new ModelResourceLocation(BlockSource.getRegistryName(), "inventory"));
     }
 
     @Mod.InstanceFactory

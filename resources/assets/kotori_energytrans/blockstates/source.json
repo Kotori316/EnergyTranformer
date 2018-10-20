@@ -1,0 +1,23 @@
+{
+  "forge_marker": 1,
+  "defaults": {
+    "model": "cube",
+    "textures": {
+      "particle": "kotori_energytrans:blocks/s",
+      "down": "kotori_energytrans:blocks/s",
+      "up": "kotori_energytrans:blocks/s",
+      "north": "kotori_energytrans:blocks/s",
+      "east": "kotori_energytrans:blocks/s",
+      "south": "kotori_energytrans:blocks/s",
+      "west": "kotori_energytrans:blocks/s"
+    }
+  },
+  "variants": {
+    "normal": [
+      {}
+    ],
+    "inventory": [
+      {}
+    ]
+  }
+}

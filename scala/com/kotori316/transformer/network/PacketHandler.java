@@ -21,9 +21,15 @@ public enum PacketHandler {
     public void init() {
         IMessageHandler<TransAverageMessage, IMessage> handler1 = TransAverageMessage::onRecieve;
         wrapper.registerMessage(handler1, TransAverageMessage.class, 0, Side.CLIENT);
+        IMessageHandler<SourceAmountMessage, IMessage> handler2 = SourceAmountMessage::onReceive;
+        wrapper.registerMessage(handler2, SourceAmountMessage.class, 1, Side.SERVER);
     }
 
     public void sendToPlayer(IMessage message, EntityPlayerMP player) {
         wrapper.sendTo(message, player);
+    }
+
+    public void sendToServer(IMessage message) {
+        wrapper.sendToServer(message);
     }
 }
