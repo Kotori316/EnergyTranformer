@@ -19,10 +19,14 @@ public enum PacketHandler {
     }
 
     public void init() {
+        int i = 0;
         IMessageHandler<TransAverageMessage, IMessage> handler1 = TransAverageMessage::onRecieve;
-        wrapper.registerMessage(handler1, TransAverageMessage.class, 0, Side.CLIENT);
+        wrapper.registerMessage(handler1, TransAverageMessage.class, i++, Side.CLIENT);
         IMessageHandler<SourceAmountMessage, IMessage> handler2 = SourceAmountMessage::onReceive;
-        wrapper.registerMessage(handler2, SourceAmountMessage.class, 1, Side.SERVER);
+        wrapper.registerMessage(handler2, SourceAmountMessage.class, i++, Side.SERVER);
+        IMessageHandler<SourceGUIMessage, IMessage> handler3 = SourceGUIMessage::onReceive;
+        wrapper.registerMessage(handler3, SourceGUIMessage.class, i++, Side.SERVER);
+        assert i > 0;
     }
 
     public void sendToPlayer(IMessage message, EntityPlayerMP player) {
