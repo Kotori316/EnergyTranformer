@@ -41,13 +41,14 @@ class TileSource extends TileEntity with ITickable {
 
   override def readFromNBT(compound: NBTTagCompound): Unit = {
     super.readFromNBT(compound)
-    compound.setInteger("amount", amount)
-    compound.setInteger("T", T)
+    amount = compound.getInteger("amount")
+    T = compound.getInteger("T")
+    if (T <= 0) T = 1
   }
 
   override def writeToNBT(compound: NBTTagCompound): NBTTagCompound = {
-    amount = compound.getInteger("amount")
-    T = compound.getInteger("T")
+    compound.setInteger("amount", amount)
+    compound.setInteger("T", T)
     super.writeToNBT(compound)
   }
 
