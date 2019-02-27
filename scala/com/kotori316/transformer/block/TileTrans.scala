@@ -28,7 +28,8 @@ class TileTrans extends TileEntity with ITickable
     val receiveQueue = new java.util.ArrayDeque[Long](numElements)
     val extractQueue = new java.util.ArrayDeque[Long](numElements)
     val capacity = 1e18.toLong
-    private[this] val hasBC = ModAPIManager.INSTANCE.hasAPI("BuildCraftAPI|core")
+    private[this] val hasBC = Loader.isModLoaded(MJStorage.bcId)
+    //ModAPIManager.INSTANCE.hasAPI("BuildCraftAPI|core")
     private[this] val hasRF = Loader.isModLoaded("redstoneflux")
     private[this] val hasIC2 = Loader.isModLoaded("ic2")
     private[this] val mJStorage = EnumFacing.VALUES.+:(null).map(f => (f, MJStorage(hasBC, this, f))).toMap
@@ -53,12 +54,12 @@ class TileTrans extends TileEntity with ITickable
             }
             val t = getWorld.getTileEntity(getPos.offset(extractFacing))
             if (t != null) {
-                if (hasRF && isRFReciever(t)) {
+                if (hasRF && isRFReceiver(t)) {
                     transferRF(t, extractFacing.getOpposite)
                 } else if (hasIC2 && isEUReceiver(t)) {
                     transferEU(t, extractFacing.getOpposite)
-                } else if (hasBC && MJStorage.isMJReciever(t, extractFacing.getOpposite)) {
-                    mJStorage(extractFacing).tranferMJ(t, extractFacing.getOpposite)
+                } else if (hasBC && MJStorage.isMJReceiver(t, extractFacing.getOpposite)) {
+                    mJStorage(extractFacing).transferMJ(t, extractFacing.getOpposite)
                 } else if (t.hasCapability(CapabilityEnergy.ENERGY, extractFacing.getOpposite)) {
                     val handler = t.getCapability(CapabilityEnergy.ENERGY, extractFacing.getOpposite)
                     if (handler.canReceive) {
@@ -153,7 +154,7 @@ class TileTrans extends TileEntity with ITickable
         }
     }
 
-    def getRecievedAverage: Long = {
+    def getReceivedAverage: Long = {
         import scala.collection.JavaConverters._
         val sum = receiveQueue.asScala.sum
         if (sum == 0) return 0l
@@ -255,7 +256,7 @@ class TileTrans extends TileEntity with ITickable
     override def canConnectEnergy(from: EnumFacing) = true
 
     @Method(modid = "redstoneflux")
-    private def isRFReciever(t: TileEntity) = t.isInstanceOf[IEnergyReceiver]
+    private def isRFReceiver(t: TileEntity) = t.isInstanceOf[IEnergyReceiver]
 
     @Method(modid = "redstoneflux")
     private def transferRF(t: TileEntity, facing: EnumFacing): Unit = {

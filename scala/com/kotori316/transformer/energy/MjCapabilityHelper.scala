@@ -8,7 +8,7 @@ import net.minecraftforge.fml.common.Optional.Method
 final class MjCapabilityHelper(storage: MJStorage) extends ICapabilityProvider {
     override def getCapability[T](capability: Capability[T], facing: EnumFacing) = getCapabilityImpl(capability, facing)
 
-    @Method(modid = "BuildCraftAPI|core")
+    @Method(modid = MJStorage.bcId)
     private def getCapabilityImpl[T](capability: Capability[T], facing: EnumFacing): T = {
         capability match {
             case MjAPI.CAP_CONNECTOR => MjAPI.CAP_CONNECTOR.cast(storage)
@@ -22,7 +22,7 @@ final class MjCapabilityHelper(storage: MJStorage) extends ICapabilityProvider {
 
     override def hasCapability(capability: Capability[_], facing: EnumFacing): Boolean = hasCapabilityImpl(capability, facing)
 
-    @Method(modid = "BuildCraftAPI|core")
+    @Method(modid = MJStorage.bcId)
     private def hasCapabilityImpl(capability: Capability[_], facing: EnumFacing): Boolean = {
         if (facing != storage.tile.extractFacing) {
             capability match {

@@ -7,14 +7,14 @@ import net.minecraftforge.fml.common.Optional.Method
 
 class IC2Helper(val hasIC2: Boolean, tile: TileTrans) {
 
-    var ic2Inited = false
+  var ic2Initialized = false
 
     def postLoadEvent(): Unit = {
-        if (!ic2Inited) {
+      if (!ic2Initialized) {
             if (hasIC2 && !tile.getWorld.isRemote) {
                 postLoadInternal()
             }
-            ic2Inited = true
+        ic2Initialized = true
         }
     }
 
@@ -22,11 +22,11 @@ class IC2Helper(val hasIC2: Boolean, tile: TileTrans) {
     private def postLoadInternal(): Unit = MinecraftForge.EVENT_BUS.post(new EnergyTileLoadEvent(tile))
 
     def postUnloadEvent(): Unit = {
-        if (ic2Inited) {
+      if (ic2Initialized) {
             if (hasIC2 && !tile.getWorld.isRemote) {
                 postUnloadInternal()
             }
-            ic2Inited = false
+        ic2Initialized = false
         }
     }
 

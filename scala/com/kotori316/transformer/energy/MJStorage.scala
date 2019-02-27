@@ -7,12 +7,12 @@ import net.minecraft.util.EnumFacing
 import net.minecraftforge.common.capabilities.{Capability, ICapabilityProvider}
 import net.minecraftforge.fml.common.Optional.{Interface, Method}
 
-@Interface(iface = "buildcraft.api.mj.IMjRedstoneReceiver", modid = "BuildCraftAPI|core")
-@Interface(iface = "buildcraft.api.mj.IMjReadable", modid = "BuildCraftAPI|core")
-@Interface(iface = "buildcraft.api.mj.IMjPassiveProvider", modid = "BuildCraftAPI|core")
+@Interface(iface = "buildcraft.api.mj.IMjRedstoneReceiver", modid = MJStorage.bcId)
+@Interface(iface = "buildcraft.api.mj.IMjReadable", modid = MJStorage.bcId)
+@Interface(iface = "buildcraft.api.mj.IMjPassiveProvider", modid = MJStorage.bcId)
 case class MJStorage(hasBC: Boolean, tile: TileTrans, facing: EnumFacing) extends ICapabilityProvider with IMjRedstoneReceiver with IMjReadable with IMjPassiveProvider {
 
-    val mjhelper: ICapabilityProvider = {
+    val mjHelper: ICapabilityProvider = {
         if (hasBC) {
             constructMjHelper
         } else null
@@ -20,7 +20,7 @@ case class MJStorage(hasBC: Boolean, tile: TileTrans, facing: EnumFacing) extend
 
     override def getCapability[T](capability: Capability[T], facing: EnumFacing) = {
         if (hasBC) {
-            mjhelper.getCapability(capability, facing)
+            mjHelper.getCapability(capability, facing)
         } else {
             null.asInstanceOf[T]
         }
@@ -28,16 +28,16 @@ case class MJStorage(hasBC: Boolean, tile: TileTrans, facing: EnumFacing) extend
 
     override def hasCapability(capability: Capability[_], facing: EnumFacing) = {
         if (hasBC) {
-            mjhelper.hasCapability(capability, facing)
+            mjHelper.hasCapability(capability, facing)
         } else {
             false
         }
     }
 
-    @Method(modid = "BuildCraftAPI|core")
+    @Method(modid = MJStorage.bcId)
     def constructMjHelper: ICapabilityProvider = new MjCapabilityHelper(this)
 
-    @Method(modid = "BuildCraftAPI|core")
+    @Method(modid = MJStorage.bcId)
     override def receivePower(microJoules: Long, simulate: Boolean) = {
         if (tile.acceptable < microJoules) {
             val r = tile.acceptable
@@ -53,19 +53,19 @@ case class MJStorage(hasBC: Boolean, tile: TileTrans, facing: EnumFacing) extend
         }
     }
 
-    @Method(modid = "BuildCraftAPI|core")
+    @Method(modid = MJStorage.bcId)
     override def getPowerRequested = tile.acceptable
 
-    @Method(modid = "BuildCraftAPI|core")
+    @Method(modid = MJStorage.bcId)
     override def getStored = tile.allEnergy
 
-    @Method(modid = "BuildCraftAPI|core")
+    @Method(modid = MJStorage.bcId)
     override def getCapacity = tile.capacity
 
-    @Method(modid = "BuildCraftAPI|core")
+    @Method(modid = MJStorage.bcId)
     override def canConnect(other: IMjConnector) = true
 
-    @Method(modid = "BuildCraftAPI|core")
+    @Method(modid = MJStorage.bcId)
     override def extractPower(min: Long, max: Long, simulate: Boolean): Long = {
         if (getStored > max) {
             if (!simulate) {
@@ -83,14 +83,14 @@ case class MJStorage(hasBC: Boolean, tile: TileTrans, facing: EnumFacing) extend
         }
     }
 
-    @Method(modid = "BuildCraftAPI|core")
-    def tranferMJ(t: TileEntity, facing: EnumFacing): Unit = {
-        val reciever = t.getCapability(MjAPI.CAP_RECEIVER, facing)
-        if (reciever.canReceive) {
-            val required = Math.min(reciever.getPowerRequested, getStored)
-            val e = reciever.receivePower(required, true)
+    @Method(modid = MJStorage.bcId)
+    def transferMJ(t: TileEntity, facing: EnumFacing): Unit = {
+        val receiver = t.getCapability(MjAPI.CAP_RECEIVER, facing)
+        if (receiver.canReceive) {
+            val required = Math.min(receiver.getPowerRequested, getStored)
+            val e = receiver.receivePower(required, true)
             if (e != required) {
-                val excess = reciever.receivePower(required, false)
+                val excess = receiver.receivePower(required, false)
                 extractPower(required - excess, required - excess, simulate = false)
             }
         }
@@ -98,6 +98,8 @@ case class MJStorage(hasBC: Boolean, tile: TileTrans, facing: EnumFacing) extend
 }
 
 object MJStorage {
-    @Method(modid = "BuildCraftAPI|core")
-    def isMJReciever(t: TileEntity, facing: EnumFacing): Boolean = t.hasCapability(MjAPI.CAP_RECEIVER, facing)
+    final val bcId = "buildcraftlib"
+
+    @Method(modid = MJStorage.bcId)
+    def isMJReceiver(t: TileEntity, facing: EnumFacing): Boolean = t.hasCapability(MjAPI.CAP_RECEIVER, facing)
 }

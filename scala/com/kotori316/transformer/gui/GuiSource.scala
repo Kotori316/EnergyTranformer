@@ -1,6 +1,6 @@
 package com.kotori316.transformer.gui
 
-import com.kotori316.transformer.EnergyTranformer
+import com.kotori316.transformer.EnergyTransformer
 import com.kotori316.transformer.block.TileSource
 import com.kotori316.transformer.network.{PacketHandler, SourceAmountMessage}
 import net.minecraft.client.gui.GuiTextField
@@ -12,7 +12,7 @@ import org.lwjgl.input.Keyboard
 import org.lwjgl.opengl.GL11
 
 class GuiSource(player: EntityPlayer, tile: TileSource) extends GuiContainer(new ContainerSource(player, tile)) {
-    val LOCATION = new ResourceLocation(EnergyTranformer.modID, "textures/gui/energytranformer.png")
+    val LOCATION = new ResourceLocation(EnergyTransformer.modID, "textures/gui/energytranformer.png")
     var text: GuiTextField = _
 
     override def initGui(): Unit = {
@@ -51,7 +51,7 @@ class GuiSource(player: EntityPlayer, tile: TileSource) extends GuiContainer(new
         text.drawTextBox()
     }
 
-    override def drawGuiContainerBackgroundLayer(partialTicks: Float, mouseX: Int, mouseY: Int) = {
+    override def drawGuiContainerBackgroundLayer(partialTicks: Float, mouseX: Int, mouseY: Int): Unit = {
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F)
         this.mc.getTextureManager.bindTexture(LOCATION)
         this.drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize)

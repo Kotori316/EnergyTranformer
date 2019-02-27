@@ -7,7 +7,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
-import com.kotori316.transformer.EnergyTranformer;
+import com.kotori316.transformer.EnergyTransformer;
 
 public enum PacketHandler {
     INSTANCE;
@@ -15,12 +15,12 @@ public enum PacketHandler {
     private final SimpleNetworkWrapper wrapper;
 
     PacketHandler() {
-        this.wrapper = NetworkRegistry.INSTANCE.newSimpleChannel(EnergyTranformer.modID);
+        this.wrapper = NetworkRegistry.INSTANCE.newSimpleChannel(EnergyTransformer.modID);
     }
 
     public void init() {
         int i = 0;
-        IMessageHandler<TransAverageMessage, IMessage> handler1 = TransAverageMessage::onRecieve;
+        IMessageHandler<TransAverageMessage, IMessage> handler1 = TransAverageMessage::onReceive;
         wrapper.registerMessage(handler1, TransAverageMessage.class, i++, Side.CLIENT);
         IMessageHandler<SourceAmountMessage, IMessage> handler2 = SourceAmountMessage::onReceive;
         wrapper.registerMessage(handler2, SourceAmountMessage.class, i++, Side.SERVER);

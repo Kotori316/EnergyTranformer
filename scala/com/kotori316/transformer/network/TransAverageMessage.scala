@@ -19,34 +19,34 @@ class TransAverageMessage(tile: TileTrans) extends IMessage {
 
     var pos = BlockPos.ORIGIN
     var dimID = 0
-    var recieveAverage = 0l
+    var receiveAverage = 0l
     var extractAverage = 0l
     if (tile != null) {
         pos = tile.getPos
         dimID = tile.getWorld.provider.getDimension
-        recieveAverage = tile.getRecievedAverage
+        receiveAverage = tile.getReceivedAverage
         extractAverage = tile.getExtractedAverage
     }
 
-    override def toBytes(packet: ByteBuf) = {
+    override def toBytes(packet: ByteBuf): Unit = {
         val buf = new PacketBuffer(packet)
-        buf.writeBlockPos(pos).writeInt(dimID).writeLong(recieveAverage).writeLong(extractAverage)
+        buf.writeBlockPos(pos).writeInt(dimID).writeLong(receiveAverage).writeLong(extractAverage)
     }
 
-    override def fromBytes(packet: ByteBuf) = {
+    override def fromBytes(packet: ByteBuf): Unit = {
         val buf = new PacketBuffer(packet)
         pos = buf.readBlockPos()
         dimID = buf.readInt()
-        recieveAverage = buf.readLong()
+        receiveAverage = buf.readLong()
         extractAverage = buf.readLong()
     }
 
     @SideOnly(Side.CLIENT)
-    def onRecieve(ctx: MessageContext): IMessage = {
+    def onReceive(ctx: MessageContext): IMessage = {
         Minecraft.getMinecraft.addScheduledTask(new Runnable {
             override def run(): Unit = {
                 Minecraft.getMinecraft.player.openContainer match {
-                    case c: ContainerTrans => c.recieveAve = recieveAverage; c.extractAve = extractAverage
+                    case c: ContainerTrans => c.receiveAve = receiveAverage; c.extractAve = extractAverage
                     case _ =>
                 }
             }

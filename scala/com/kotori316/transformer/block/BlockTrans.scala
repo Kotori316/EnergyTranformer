@@ -1,6 +1,6 @@
 package com.kotori316.transformer.block
 
-import com.kotori316.transformer.EnergyTranformer
+import com.kotori316.transformer.EnergyTransformer
 import com.kotori316.transformer.gui.GuiHandler
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.{BlockStateContainer, IBlockState}
@@ -19,11 +19,11 @@ object BlockTrans extends BlockContainer(Material.IRON) {
     val instance = this
 
     setUnlocalizedName(NAME)
-    setRegistryName(EnergyTranformer.modID, NAME)
+    setRegistryName(EnergyTransformer.modID, NAME)
     setCreativeTab(CreativeTabs.REDSTONE)
     setHardness(5.0f)
     val itemBlock = new ItemBlock(this)
-    itemBlock.setRegistryName(EnergyTranformer.modID, NAME)
+    itemBlock.setRegistryName(EnergyTransformer.modID, NAME)
     setDefaultState(getBlockState.getBaseState.withProperty(FACING, EnumFacing.NORTH))
 
     override def createNewTileEntity(worldIn: World, meta: Int) = new TileTrans
@@ -35,7 +35,7 @@ object BlockTrans extends BlockContainer(Material.IRON) {
     override def onBlockActivated(worldIn: World, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, hand: EnumHand,
                                   facing: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
         if (!playerIn.isSneaking) {
-            playerIn.openGui(EnergyTranformer.INSTANCE, GuiHandler.guiID_trans, worldIn, pos.getX, pos.getY, pos.getZ)
+            playerIn.openGui(EnergyTransformer.INSTANCE, GuiHandler.guiID_trans, worldIn, pos.getX, pos.getY, pos.getZ)
             return true
         }
         super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)

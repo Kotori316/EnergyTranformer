@@ -30,16 +30,16 @@ import com.kotori316.transformer.block.TileTrans;
 import com.kotori316.transformer.gui.GuiHandler;
 import com.kotori316.transformer.network.PacketHandler;
 
-@Mod(name = EnergyTranformer.MOD_NAME, modid = EnergyTranformer.modID, version = "${version}")
-public class EnergyTranformer {
+@Mod(name = EnergyTransformer.MOD_NAME, modid = EnergyTransformer.modID, version = "${version}")
+public class EnergyTransformer {
 
-    public static final EnergyTranformer INSTANCE;
-    public static final String MOD_NAME = "EnergyTranformer";
+    public static final EnergyTransformer INSTANCE;
+    public static final String MOD_NAME = "EnergyTransformer";
     public static final String modID = "kotori_energytrans";
     public static final Logger LOGGER = LogManager.getLogger(MOD_NAME);
 
     static {
-        INSTANCE = new EnergyTranformer();
+        INSTANCE = new EnergyTransformer();
     }
 
     @EventHandler
@@ -50,7 +50,7 @@ public class EnergyTranformer {
     @EventHandler
     public void init(FMLInitializationEvent event) {
         PacketHandler.INSTANCE.init();
-        NetworkRegistry.INSTANCE.registerGuiHandler(EnergyTranformer.instance(), GuiHandler.instance());
+        NetworkRegistry.INSTANCE.registerGuiHandler(EnergyTransformer.instance(), GuiHandler.instance());
     }
 
     @EventHandler
@@ -82,7 +82,7 @@ public class EnergyTranformer {
     }
 
     @Mod.InstanceFactory
-    public static EnergyTranformer instance() {
+    public static EnergyTransformer instance() {
         return INSTANCE;
     }
 }

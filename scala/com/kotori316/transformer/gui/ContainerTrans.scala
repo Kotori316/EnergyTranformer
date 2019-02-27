@@ -8,7 +8,7 @@ import net.minecraft.item.ItemStack
 
 class ContainerTrans(tile: TileTrans, player: EntityPlayer) extends Container {
     val oneBox = 18
-    var recieveAve = tile.getRecievedAverage
+    var receiveAve = tile.getReceivedAverage
     var extractAve = tile.getExtractedAverage
 
     for (h <- 0 until 3)
