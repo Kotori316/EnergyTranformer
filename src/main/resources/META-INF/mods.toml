@@ -1,0 +1,23 @@
+modLoader="javafml" #mandatory
+loaderVersion="[25,)" #mandatory (24 is current forge version)
+issueTrackerURL="https://github.com/Kotori316/FluidTank/issues" #optional
+[[mods]] #mandatory
+modId="energytransformer" #mandatory
+version="${file.jarVersion}" #mandatory
+displayName="EnergyTransformer" #mandatory
+credits="Kotori316" #optional
+authors="Kotori316" #optional
+description='''
+EnergyTransformer'''
+[[dependencies.energytransformer]] #optional
+        modId="forge" #mandatory
+        mandatory=true #mandatory
+        versionRange="[25,)" #mandatory
+        ordering="NONE"
+        side="BOTH"
+[[dependencies.energytransformer]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.13.2]"
+    ordering="NONE"
+    side="BOTH"

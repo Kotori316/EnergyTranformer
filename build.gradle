@@ -1,94 +1,72 @@
 buildscript {
     repositories {
+        maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = "https://plugins.gradle.org/m2/" }
         jcenter()
-        maven { url = "http://files.minecraftforge.net/maven" }
+        mavenCentral()
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
     }
 }
-apply plugin: 'scala'
-apply plugin: 'net.minecraftforge.gradle.forge'
-//Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
+apply plugin: 'java'
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'eclipse'
 
+version = "2.0"
+group = 'com.kotori316'
+archivesBaseName = 'EnergyTransformer'
 
-version = "1.5"
-group = "com.kotori316" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "EnergyTransformer"
-
-sourceCompatibility = targetCompatibility = "1.8" // Need this here so eclipse task generates correctly.
-compileScala {
-    sourceCompatibility = targetCompatibility = "1.8"
-    compileScala.options.compilerArgs = ['-Xlint:all']
-    scalaCompileOptions.additionalParameters = ["-feature"]
-}
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
 minecraft {
-    version = "1.12.2-14.23.5.2838"
-    runDir = "Minecraft"
+    mappings channel: 'snapshot', version: '20190522-1.13.2'
+    runs {
+        client {
+            workingDirectory project.file('Minecraft')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            mods {
+                energytransformer {
+                    source sourceSets.main
+                }
+            }
+        }
+        server {
+            workingDirectory project.file('run-server')
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'info'
+            mods {
+                energytransformer {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
 
-    mappings = "snapshot_20171003"
-    makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
-    replace "\${version}", project.version
-}
-repositories {
-    maven {
-        // location of the maven that hosts JEI files
-        name = "Progwml6 maven"
-        url = "http://dvs1.progwml6.com/files/maven"
-    }
-    maven {
-        name = "CoFH Maven"
-        url = "http://maven.covers1624.net"
-    }
-    maven {
-        name "BuildCraft"
-        url = "https://mod-buildcraft.com/maven"
-    }
-    maven {
-        name = "ic2"
-        url = "http://maven.ic2.player.to/"
-    }
-}
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    deobfCompile "cofh:RedstoneFlux:1.12-2.1.0.6:universal"
-    deobfCompile "com.mod-buildcraft:buildcraft-main:7.99.22"
-    deobfCompile 'net.industrial-craft:industrialcraft-2:2.8.75-ex112:dev'
+    minecraft 'net.minecraftforge:forge:1.13.2-25.0.219'
+    implementation "org.scala-lang:scala-library:2.12.8"
 }
-
-sourceSets {
-    main {
-        scala {
-            srcDir 'scala'
-        }
-        resources {
-            srcDir 'resources'
-        }
-    }
-}
-
-processResources {
-    // this will ensure that this task is redone when the versions change.
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
-
-    // replace stuff in mcmod.info, nothing else
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-
-        // replace version and mcversion
-        expand 'version': project.version, 'mcversion': project.minecraft.version
-    }
-
-    // copy everything else, that's not the mcmod.info
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
-}
-
 jar {
-    classifier = 'universal'
+    manifest {
+        attributes([
+                "Specification-Title"     : project.name,
+                "Specification-Vendor"    : "Kotori316",
+                "Specification-Version"   : "1",
+                "Implementation-Title"    : project.name,
+                "Implementation-Version"  : "${version}",
+                "Implementation-Vendor"   : "Kotori316",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
+
+def reobfFile = file("$buildDir/reobfJar/output.jar")
+def reobfArtifact = artifacts.add('default', reobfFile) {
+    type 'jar'
+    builtBy 'reobfJar'
 }
 
 task srcJar(type: Jar) {
@@ -101,7 +79,21 @@ task deobfJar(type: Jar) {
     classifier = 'deobf'
 }
 
-// Tell the artifact system about our extra jars
 artifacts {
     archives srcJar, deobfJar
 }
+
+task signJar2() {
+    doLast {
+        ant.signjar(
+                jar: jar.archivePath,
+                alias: project.hasProperty('keyStoreAlias') ? project.getProperty('keyStoreAlias') : "",
+                keystore: project.hasProperty('keyStore') ? project.getProperty("keyStore") : "",
+                storepass: project.hasProperty('keyStorePass') ? project.getProperty('keyStorePass') : "",
+                sigalg: "SHA1withRSA",
+                digestalg: "SHA-256",
+                tsaurl: "http://timestamp.digicert.com"
+        )
+    }
+}
+assemble.dependsOn(signJar2)
