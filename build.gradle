@@ -13,7 +13,7 @@ apply plugin: 'java'
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 
-version = "2.0"
+version = "2.1"
 group = 'com.kotori316'
 archivesBaseName = 'EnergyTransformer'
 
